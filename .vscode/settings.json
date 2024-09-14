@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "wait.h": "c"
+        "wait.h": "c",
+        "pthread.h": "c",
+        "types.h": "c",
+        "functional": "c",
+        "socket.h": "c",
+        "sstream": "c"
     }
 }
