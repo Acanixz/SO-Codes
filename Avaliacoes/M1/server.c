@@ -21,6 +21,27 @@ typedef struct {
     int id;
 } thread_arg_t;
 
+void reverse(char* str) {
+
+    // Initialize first and last pointers
+    int first = 0;
+    int last = strlen(str) - 1;
+    char temp;
+
+    // Swap characters till first and last meet
+    while (first < last) {
+      
+        // Swap characters
+        temp = str[first];
+        str[first] = str[last];
+        str[last] = temp;
+
+        // Move pointers towards each other
+        first++;
+        last--;
+    }
+}
+
 int main()
 {
     // TODO: CÓDIGO PODE FALHAR CASO OS CAMINHOS NAO EXISTAM, CERTIFIQUE QUE A PASTA EXISTE ANTES
@@ -104,6 +125,7 @@ void *strThreadHandler(void *arg){
     socklen_t len = sizeof(remote);
     char buffer[1024];
 
+    // Thread continuará aceitando conexões
     while (1) {
         int client_sock = accept(server_sock, (struct sockaddr *)&remote, &len);
         if (client_sock < 0) {
@@ -111,21 +133,30 @@ void *strThreadHandler(void *arg){
             continue;
         }
 
-        printf("Client conectado!\n");
+        printf("Client conectado! thread %d\n", thread_id);
 
-        // Handle the client request
-        int n = read(client_sock, buffer, sizeof(buffer));
-        if (n > 0) {
-            //buffer[n] = '\0';
-            printf("Thread %d recebeu: %s\n", thread_id, buffer); // Print the thread identifier
-            
-            if (buffer == "exit"){
-                printf("Fechando conexão!");
-            } else {
-                printf("Comando normal :)");
-            }
+        // Lendo buffer
+        if (read(client_sock, buffer, sizeof(buffer)) < 0)
+        {
+            perror("Falha em ler do socket");
+            close(client_sock);
+            continue;
         }
 
+        printf("Dado recebido no thread %d: %s\n", thread_id, buffer);
+
+        // Reverte a string
+        reverse(buffer);
+
+        // Retorna a string para o client
+        if (write(client_sock, buffer, strlen(buffer) + 1) < 0)
+        {
+            perror("Falha em escrever no socket");
+            close(client_sock);
+            continue;
+        }
+
+        // Fecha conexão atual, loop continua
         close(client_sock);
     }
 
