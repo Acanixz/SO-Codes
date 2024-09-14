@@ -14,33 +14,14 @@
 #define THREAD_POOL_SIZE 4
 
 int socketSetup(char *SOCK_PATH);
-void *strThreadHandler(void *arg);
+void *threadHandler(void *arg);
+void strThreadHandler();
 
 typedef struct {
+    char *sock_path;
     int server_sock;
     int id;
 } thread_arg_t;
-
-void reverse(char* str) {
-
-    // Initialize first and last pointers
-    int first = 0;
-    int last = strlen(str) - 1;
-    char temp;
-
-    // Swap characters till first and last meet
-    while (first < last) {
-      
-        // Swap characters
-        temp = str[first];
-        str[first] = str[last];
-        str[last] = temp;
-
-        // Move pointers towards each other
-        first++;
-        last--;
-    }
-}
 
 int main()
 {
@@ -50,22 +31,30 @@ int main()
         num_thread_pool[THREAD_POOL_SIZE]
     ;
 
+    // Socket e Thread pool para String
     int str_sock = socketSetup(STRING_SOCK_PATH);
-    
-    // Create thread pool
     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
         thread_arg_t *arg = malloc(sizeof(thread_arg_t));
+        arg->sock_path = STRING_SOCK_PATH;
         arg->server_sock = str_sock;
         arg->id = i;
-        pthread_create(&str_thread_pool[i], NULL, strThreadHandler, arg);
+        pthread_create(&str_thread_pool[i], NULL, threadHandler, arg);
     }
 
-    // TODO: IMPLEMENTAR NUMBER SOCKET
-    // int num_sock = socketSetup(NUMBER_SOCK_PATH);
+    // Socket e Thread pool para Número
+    int num_sock = socketSetup(NUMBER_SOCK_PATH);
+    for (int i = 0; i < THREAD_POOL_SIZE; i++) {
+        thread_arg_t *arg = malloc(sizeof(thread_arg_t));
+        arg->sock_path = NUMBER_SOCK_PATH;
+        arg->server_sock = num_sock;
+        arg->id = i;
+        pthread_create(&num_thread_pool[i], NULL, threadHandler, arg);
+    }
 
     // Wait for threads to finish (optional, depending on your design)
     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
         pthread_join(str_thread_pool[i], NULL);
+        pthread_join(num_thread_pool[i], NULL);
     }
 
     return 0;
@@ -113,9 +102,34 @@ int socketSetup(char *SOCK_PATH){
     return server_sock;
 }
 
-void *strThreadHandler(void *arg){
+void stringProcess(char *buffer){
+    // Initialize first and last pointers
+    int first = 0;
+    int last = strlen(buffer) - 1;
+    char temp;
+
+    // Swap characters till first and last meet
+    while (first < last) {
+      
+        // Swap characters
+        temp = buffer[first];
+        buffer[first] = buffer[last];
+        buffer[last] = temp;
+
+        // Move pointers towards each other
+        first++;
+        last--;
+    }
+}
+
+void numberProcess(char *buffer){
+    printf("NUMBER PROCESSING NOT IMPLEMENTED, NOTHING HAPPENED\n");
+}
+
+void *threadHandler(void *arg){
     // Define o server address no escopo local e apaga o arg alocado
     thread_arg_t *thread_arg = (thread_arg_t *)arg;
+    char *sock_path = thread_arg->sock_path;
     int server_sock = thread_arg->server_sock;
     int thread_id = thread_arg->id;
     free(thread_arg);
@@ -127,13 +141,14 @@ void *strThreadHandler(void *arg){
 
     // Thread continuará aceitando conexões
     while (1) {
+        printf("%s [THREAD %d]: Aguardando conexao\n", sock_path, thread_id);
         int client_sock = accept(server_sock, (struct sockaddr *)&remote, &len);
         if (client_sock < 0) {
             perror("Falha em aceitar conexão");
             continue;
         }
 
-        printf("Client conectado! thread %d\n", thread_id);
+        printf("%s [THREAD %d]: Cliente conectado\n", sock_path ,thread_id);
 
         // Lendo buffer
         if (read(client_sock, buffer, sizeof(buffer)) < 0)
@@ -143,10 +158,15 @@ void *strThreadHandler(void *arg){
             continue;
         }
 
-        printf("Dado recebido no thread %d: %s\n", thread_id, buffer);
+        printf("%s [THREAD %d] Dado recebido: %s\n", sock_path, thread_id, buffer);
 
-        // Reverte a string
-        reverse(buffer);
+        if (sock_path == STRING_SOCK_PATH){
+            stringProcess(&buffer);
+        } else {
+            numberProcess(&buffer);
+        }
+
+        printf("%s [THREAD %d] Enviando p/ cliente: %s\n", sock_path, thread_id, buffer);
 
         // Retorna a string para o client
         if (write(client_sock, buffer, strlen(buffer) + 1) < 0)
@@ -161,8 +181,4 @@ void *strThreadHandler(void *arg){
     }
 
     return NULL;
-}
-
-void *numThreadHandler(void *arg){
-
 }

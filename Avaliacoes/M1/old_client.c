@@ -37,6 +37,7 @@ int main()
     printf("Conectado ao servidor!\n");
 
     // Send data to server
+    printf("O servidor ira receber a string e inverter");
     printf("Entre com o dado a ser enviado: ");
     fgets(buffer, sizeof(buffer), stdin);
     if (write(sockfd, buffer, strlen(buffer) + 1) < 0)
