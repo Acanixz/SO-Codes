@@ -122,8 +122,12 @@ void stringProcess(char *buffer){
     }
 }
 
-void numberProcess(char *buffer){
-    printf("NUMBER PROCESSING NOT IMPLEMENTED, NOTHING HAPPENED\n");
+void numberProcess(char *buffer) {
+    int number = atoi(buffer); // Convert the string to an integer
+    number += 10; // Increment the number by 10
+
+    // Convert the number back to a string
+    snprintf(buffer, 1024, "%d", number);
 }
 
 void *threadHandler(void *arg){
