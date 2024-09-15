@@ -8,6 +8,8 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 #define STRING_SOCK_PATH "/tmp/M1SO/String"
 #define NUMBER_SOCK_PATH "/tmp/M1SO/Number"
@@ -23,10 +25,29 @@ typedef struct {
     int id;
 } thread_arg_t;
 
+void prepareSocketFolder(){
+    struct stat st = {0};
+
+    // Procura por pasta
+    if (stat("/tmp/M1SO", &st) == -1) {
+        // Cria diretório
+        if (mkdir("/tmp/M1SO", 0700) == 0) {
+            printf("Pasta temporaria criada com sucesso\n");
+        } else {
+            perror("Falha ao criar o diretorio: ");
+            return 1;
+        }
+    } else {
+        printf("Pasta temporaria OK\n");
+    }
+
+    return 0;
+}
+
 int main()
 {
-    // TODO: CÓDIGO PODE FALHAR CASO OS CAMINHOS NAO EXISTAM, CERTIFIQUE QUE A PASTA EXISTE ANTES
-    pthread_t 
+    prepareSocketFolder();
+    pthread_t
         str_thread_pool[THREAD_POOL_SIZE],
         num_thread_pool[THREAD_POOL_SIZE]
     ;
