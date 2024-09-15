@@ -13,11 +13,18 @@
 
 #define STRING_SOCK_PATH "/tmp/M1SO/String"
 #define NUMBER_SOCK_PATH "/tmp/M1SO/Number"
+
+/*  Escolhi 4 threads pois considerando em um servidor de 8 nucleos 
+    lógicos onde ele é o principal processo, faz sentido cada pipe
+    igualmente balancear a alocação, porém, se rodar em um
+    ambiente com mais processos ativos (Comp. Pessoais por exemplo),
+    pode considerar diminuir para evitar slowdown devido a 
+    concorrencia com outros processos existentes
+*/
 #define THREAD_POOL_SIZE 4
 
 int socketSetup(char *SOCK_PATH);
 void *threadHandler(void *arg);
-void strThreadHandler();
 
 typedef struct {
     char *sock_path;
@@ -46,13 +53,14 @@ void prepareSocketFolder(){
 
 int main()
 {
+    // Prepara pasta do socket e thread pool
     prepareSocketFolder();
     pthread_t
         str_thread_pool[THREAD_POOL_SIZE],
         num_thread_pool[THREAD_POOL_SIZE]
     ;
 
-    // Socket e Thread pool para String
+    // Prepara o pipe de string e cria threads
     int str_sock = socketSetup(STRING_SOCK_PATH);
     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
         thread_arg_t *arg = malloc(sizeof(thread_arg_t));
@@ -62,7 +70,7 @@ int main()
         pthread_create(&str_thread_pool[i], NULL, threadHandler, arg);
     }
 
-    // Socket e Thread pool para Número
+    // Prepara o pipe de numero e cria threads
     int num_sock = socketSetup(NUMBER_SOCK_PATH);
     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
         thread_arg_t *arg = malloc(sizeof(thread_arg_t));
@@ -72,7 +80,8 @@ int main()
         pthread_create(&num_thread_pool[i], NULL, threadHandler, arg);
     }
 
-    // Wait for threads to finish (optional, depending on your design)
+    // Segura o thread principal de terminar sem a pool acabar
+    // por mais que nunca vá acabar sem intervenção manual...
     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
         pthread_join(str_thread_pool[i], NULL);
         pthread_join(num_thread_pool[i], NULL);
@@ -82,10 +91,11 @@ int main()
 }
 
 int socketSetup(char *SOCK_PATH){
-    // server_sock = socket que declara pipe disponivel (usa local)
-    int server_sock, len;
-    struct sockaddr_un local;
-    char buffer[1024];
+    int 
+        server_sock, // Server socket
+        len //  Tamanho do socket
+    ;
+    struct sockaddr_un local; // Endereço p/ o socket
 
     // Criação do pipe
     server_sock = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -101,7 +111,7 @@ int socketSetup(char *SOCK_PATH){
     unlink(local.sun_path); // Apaga socket pre-existente
     len = strlen(local.sun_path) + sizeof(local.sun_family); // len = server addr. + familia
 
-    // Tentativa de colocar o socket no server addr.
+    // Tentativa de colocar o socket no endereço
     if (bind(server_sock, (struct sockaddr *)&local, len) < 0)
     {
         perror("Falha em capturar o socket");
@@ -124,30 +134,27 @@ int socketSetup(char *SOCK_PATH){
 }
 
 void stringProcess(char *buffer){
-    // Initialize first and last pointers
     int first = 0;
     int last = strlen(buffer) - 1;
     char temp;
 
-    // Swap characters till first and last meet
+    // Inverte caracteres da string
     while (first < last) {
-      
-        // Swap characters
         temp = buffer[first];
         buffer[first] = buffer[last];
         buffer[last] = temp;
 
-        // Move pointers towards each other
         first++;
         last--;
     }
 }
 
 void numberProcess(char *buffer) {
-    int number = atoi(buffer); // Convert the string to an integer
-    number += 10; // Increment the number by 10
+    // Converte string p/ numero e incrementa +10
+    int number = atoi(buffer);
+    number += 10;
 
-    // Convert the number back to a string
+    // Converte numero p/ string
     snprintf(buffer, 1024, "%d", number);
 }
 
@@ -185,6 +192,7 @@ void *threadHandler(void *arg){
 
         printf("%s [THREAD %d] Dado recebido: %s\n", sock_path, thread_id, buffer);
 
+        // Processamento do buffer conforme a qual socket pertence
         if (sock_path == STRING_SOCK_PATH){
             stringProcess(&buffer);
         } else {
@@ -193,7 +201,7 @@ void *threadHandler(void *arg){
 
         printf("%s [THREAD %d] Enviando p/ cliente: %s\n", sock_path, thread_id, buffer);
 
-        // Retorna a string para o client
+        // Retorna para o client
         if (write(client_sock, buffer, strlen(buffer) + 1) < 0)
         {
             perror("Falha em escrever no socket");
@@ -201,7 +209,7 @@ void *threadHandler(void *arg){
             continue;
         }
 
-        // Fecha conexão atual, loop continua
+        // Pedido encerrado, loop continua
         close(client_sock);
     }
 
