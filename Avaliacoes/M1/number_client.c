@@ -87,7 +87,7 @@ void sendInfinitelyRandom(float interval) {
     char buffer[1024];
 
     while (1) {
-        // Gerar número aleatório de 10 dígitos
+        // Gerar número aleatório de 3 digitos
         generateRandomNumber(buffer, 3);
 
         int sockfd = connectToServer();
