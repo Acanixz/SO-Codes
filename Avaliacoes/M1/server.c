@@ -150,6 +150,14 @@ void stringProcess(char *buffer){
 }
 
 void numberProcess(char *buffer) {
+    // Verifica se é um numero, se não for, sobrescreve o buffer por uma mensagem de erro e retorna
+    for (int i = 0; i < strlen(buffer); i++) {
+        if (buffer[i] < '0' || buffer[i] > '9') {
+            snprintf(buffer, 1024, "ERRO: Nao eh um numero");
+            return;
+        }
+    }
+
     // Converte string p/ numero e incrementa +10
     int number = atoi(buffer);
     number += 10;
