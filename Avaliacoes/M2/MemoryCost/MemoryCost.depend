@@ -1,0 +1,20 @@
+# depslib dependency file v1.0
+1730650450 source:c:\users\acanixz\desktop\projects\so-codes\avaliacoes\m2\memorycost\stdafx.cpp
+	"stdafx.h"
+
+1730650450 c:\users\acanixz\desktop\projects\so-codes\avaliacoes\m2\memorycost\stdafx.h
+	"targetver.h"
+	<stdio.h>
+	<tchar.h>
+	<Windows.h>
+
+1730650450 c:\users\acanixz\desktop\projects\so-codes\avaliacoes\m2\memorycost\targetver.h
+	<SDKDDKVer.h>
+
+1730681865 source:c:\users\acanixz\desktop\projects\so-codes\avaliacoes\m2\memorycost\main.cpp
+	"stdafx.h"
+	<chrono>
+	<stdio.h>
+	<string.h>
+	<iostream>
+
