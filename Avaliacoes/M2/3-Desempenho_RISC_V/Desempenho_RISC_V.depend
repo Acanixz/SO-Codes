@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1731367385 source:c:\users\acanixz\downloads\so-codes\avaliacoes\m2\desempenho_risc_v\main.cpp
+	<iostream>
+	<fstream>
+	<vector>
+	<map>
+	<string>
+	"calculos.h"
+
+1731360864 c:\users\acanixz\downloads\so-codes\avaliacoes\m2\desempenho_risc_v\calculos.h
+	<iostream>
+	<fstream>
+

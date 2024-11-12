@@ -1,16 +1,16 @@
-Ôªø/*
-* Disciplina: Organiza√ß√£o de Computadores
-* Atividade : Avalia√ß√£o 02
+/*
+* Disciplina: OrganizaÁ„o de Computadores
+* Atividade : AvaliaÁ„o 02
 *
 * Grupo:
 * - Cassiano de Sena Crispim
-* - H√©rick Vitor Vieira Bittencourt
+* - HÈrick Vitor Vieira Bittencourt
 * - Eduardo Miguel Fuchs Perez
 *
-* OBSERVA√á√ÉO:
-* - Devido o uso de for loops com l√≥gica [key, value], o padr√£o ISO para
-* este projeto deve ser o C++ 17, caso contr√°rio a build ir√° falhar
-* (v√° na aba projeto->propriedades de main no visual studio 2019)
+* OBSERVA«√O:
+* - Devido o uso de for loops com lÛgica [key, value], o padr„o ISO para
+* este projeto deve ser o C++ 17, caso contr·rio a build ir· falhar
+* (v· na aba projeto->propriedades de main no visual studio 2019)
 */
 
 #include <iostream>
@@ -22,12 +22,12 @@
 using namespace std;
 
 
-// Armazena informa√ß√µes geradas pelo binary dump
+// Armazena informaÁıes geradas pelo binary dump
 struct LinhaASM {
-    // Instru√ß√£o completa (32 bits)
+    // InstruÁ„o completa (32 bits)
     string instrucao;
 
-    // Substrings da instru√ß√£o completa
+    // Substrings da instruÁ„o completa
     string opcode;
     string rd;
     string funct3;
@@ -41,7 +41,7 @@ struct LinhaASM {
 };
 
 // Mostra na tela todas as instrucoes do programa
-// (al√©m de poder destacar NOPs se preferido)
+// (alÈm de poder destacar NOPs se preferido)
 void VisualizarInstrucoes(vector<LinhaASM> programa, bool destacarNOPs = true) {
     cout << "----------------------" << endl;
 
@@ -71,13 +71,13 @@ void contarNOPs(vector<LinhaASM> programa) {
 void salvarPrograma(vector<LinhaASM> programa, string nomePrograma) {
     ofstream arquivoFinal(nomePrograma);
 
-    // Verifica√ß√£o de abertura do arquivo
+    // VerificaÁ„o de abertura do arquivo
     if (!arquivoFinal.is_open()) {
         throw std::runtime_error("Nao foi possivel abrir o arquivo " + nomePrograma + " para escrita");
         return;
     }
 
-    // Transferencia das instru√ß√µes do vetor para o arquivo
+    // Transferencia das instruÁıes do vetor para o arquivo
     for (LinhaASM linha : programa) {
         arquivoFinal << linha.instrucao << endl;
     }
@@ -86,29 +86,29 @@ void salvarPrograma(vector<LinhaASM> programa, string nomePrograma) {
     arquivoFinal.close();
 }
 
-// Uma organiza√ß√£o, utilizado para gerar estatisticas com um vetor de LinhaASM
+// Uma organizaÁ„o, utilizado para gerar estatisticas com um vetor de LinhaASM
 struct Organizacao {
     float TClock; // Tempo de clock
     float freqClock; // Frequencia de clock (1/TClock)
-    map<string, float> quantCiclos; // Quantos ciclos leva cada instru√ß√£o?
+    map<string, float> quantCiclos; // Quantos ciclos leva cada instruÁ„o?
 
 
     Organizacao() {
         quantCiclos["U"] = 1.f;
         quantCiclos["J"] = 1.f;
         quantCiclos["B"] = 1.f;
-        quantCiclos["I_ar"] = 1.f; // Quant. Ciclos p/ instru√ß√£o Imm. Aritmetico e ecall
-        quantCiclos["I_lo"] = 1.f; // Quant. Ciclos p/ instru√ß√£o Imm. Load
+        quantCiclos["I_ar"] = 1.f; // Quant. Ciclos p/ instruÁ„o Imm. Aritmetico e ecall
+        quantCiclos["I_lo"] = 1.f; // Quant. Ciclos p/ instruÁ„o Imm. Load
         quantCiclos["R"] = 1.f;
         quantCiclos["S"] = 1.f;
     }
 };
 
-// Resultados de desempenho da organiza√ß√£o com um binary dump
+// Resultados de desempenho da organizaÁ„o com um binary dump
 struct Resultados {
     float CiclosTotais; // Ciclos totais gastos
-    float CPI; // Ciclos por instru√ß√£o
-    float TExec; // Tempo de execu√ß√£o da CPU (Quant. instrucoes * CPI * Clock)
+    float CPI; // Ciclos por instruÁ„o
+    float TExec; // Tempo de execuÁ„o da CPU (Quant. instrucoes * CPI * Clock)
     double desempenho; // Float de desempenho (1.0 / TExec)
 };
 
@@ -151,7 +151,7 @@ string lerOpcode(string opcode) {
 
 bool verificarHazardInstrucao(LinhaASM instrucaoOrigem, LinhaASM instrucaoJ, bool forwardingImplementado) {
 
-    // A instru√ß√£o tipo S n√£o faz nenhuma escrita, logo, as proximas linhas n√£o ir√£o ter problemas de dependencia
+    // A instruÁ„o tipo S n„o faz nenhuma escrita, logo, as proximas linhas n„o ir„o ter problemas de dependencia
     if (instrucaoOrigem.tipoInstrucao == "S") return false;
 
     // NO-Operators, ignora
@@ -161,7 +161,7 @@ bool verificarHazardInstrucao(LinhaASM instrucaoOrigem, LinhaASM instrucaoJ, boo
     // Ignora ecalls
     if (instrucaoJ.instrucao == "00000000000000000000000001110011") return false;
 
-    // Se forwardingImplementado, apenas procura por hazards cujo a instru√ß√£o origem √© lw
+    // Se forwardingImplementado, apenas procura por hazards cujo a instruÁ„o origem È lw
     if (forwardingImplementado && instrucaoOrigem.tipoInstrucao != "I_lo") return false;
 
     if (instrucaoJ.tipoInstrucao == "R" || instrucaoJ.tipoInstrucao == "I_ar" || instrucaoJ.tipoInstrucao == "I_lo" || instrucaoJ.tipoInstrucao == "S" || instrucaoJ.tipoInstrucao == "B") {
@@ -180,7 +180,7 @@ bool verificarHazardInstrucao(LinhaASM instrucaoOrigem, LinhaASM instrucaoJ, boo
     return false;
 }
 
-// Insere um NOP a frente de cada jump, s√≥ pra ter certeza
+// Insere um NOP a frente de cada jump, sÛ pra ter certeza
 vector<LinhaASM> inserirNOPsEmJump(vector<LinhaASM> instrucoes) {
     LinhaASM noOperator; // add zero, zero, zero
     noOperator.instrucao = "00000000000000000000000000110011";
@@ -194,13 +194,13 @@ vector<LinhaASM> inserirNOPsEmJump(vector<LinhaASM> instrucoes) {
     return instrucoes;
 }
 
-// Solu√ß√£o 1
+// SoluÁ„o 1
 vector<LinhaASM> inserirNOPs(vector<LinhaASM> instrucoes, vector<int> hazards, bool forwardingImplementado) {
-    // Certo, nos temos um array contendo as instru√ß√µes I (origens cujo possuem no minimo 1 hazard nas proximas 2 linhas)
-    // Se formos de baixo pra cima, o array ser√° mais f√°cil de mexer
-    // Ao verificar as instru√ß√µes, precisamos ir de cima pra baixo a partir de I, come√ßando em I+1 at√© ser maior que I+2
-    // Se o hazard for na primeira linha, ser√° necess√°rio adicionar dois NOPs
-    // Se o hazard for na segunda linha, ser√° necess√°rio adicionar um NOP
+    // Certo, nos temos um array contendo as instruÁıes I (origens cujo possuem no minimo 1 hazard nas proximas 2 linhas)
+    // Se formos de baixo pra cima, o array ser· mais f·cil de mexer
+    // Ao verificar as instruÁıes, precisamos ir de cima pra baixo a partir de I, comeÁando em I+1 atÈ ser maior que I+2
+    // Se o hazard for na primeira linha, ser· necess·rio adicionar dois NOPs
+    // Se o hazard for na segunda linha, ser· necess·rio adicionar um NOP
 
     LinhaASM noOperator; // add zero, zero, zero
     noOperator.instrucao = "00000000000000000000000000110011";
@@ -215,11 +215,11 @@ vector<LinhaASM> inserirNOPs(vector<LinhaASM> instrucoes, vector<int> hazards, b
     noOperator.isManualNOP = true;
 
     for (int i = hazards.size() - 1; i >= 0; i--) {
-        // Quantidade de NOPs a serem adicionados, 2 se n√£o tiver forwarding, 1 se tiver
+        // Quantidade de NOPs a serem adicionados, 2 se n„o tiver forwarding, 1 se tiver
         int quantNOPs = forwardingImplementado ? 1 : 2;
 
         for (int j = hazards[i] + 1; j <= hazards[i] + (forwardingImplementado ? 1 : 2); j++) {
-            // Ignora itera√ß√£o j caso passe da quantidade de instru√ß√µes
+            // Ignora iteraÁ„o j caso passe da quantidade de instruÁıes
             if (j > instrucoes.size() - 1) continue;
 
             if (verificarHazardInstrucao(instrucoes[hazards[i]], instrucoes[j], forwardingImplementado)) {
@@ -241,31 +241,31 @@ vector<LinhaASM> aplicarReordenacao(vector<LinhaASM> instrucoes, vector<int> haz
         bool instrucaoEscolhidaDefinida = false;
         int indiceInstrucaoEscolhida = 0;
 
-        // Passa por todas as instru√ß√µes abaixo da linha da hazard
+        // Passa por todas as instruÁıes abaixo da linha da hazard
         for (int j = i+1; j < instrucoes.size(); j++) {
 
-            // Valida√ß√£o da linha p/ entrar em hazard+1 //
+            // ValidaÁ„o da linha p/ entrar em hazard+1 //
 
             // Passa linha j se ela conflita com a linha da hazard
             if (verificarHazardInstrucao(instrucoes[hazards[i]], instrucoes[j], forwardingImplementado)) continue;
 
-            // Passa linha j se n√£o tiver forwarding e ela conflitar com hazard-1
+            // Passa linha j se n„o tiver forwarding e ela conflitar com hazard-1
             if (!forwardingImplementado && i > 0){
                 if (verificarHazardInstrucao(instrucoes[hazards[i] - 1], instrucoes[j], forwardingImplementado)) continue;
             }
 
             bool linhaValidaDepois = true;
-            // Passa linha j se as linhas ap√≥s a hazard n√£o ter√£o conflito com a linha j
+            // Passa linha j se as linhas apÛs a hazard n„o ter„o conflito com a linha j
             for (int k = hazards[i] + 1; k <= hazards[i] + (forwardingImplementado ? 1 : 2); k++) {
                 // Evita k de atravessar o tamanho maximo do vetor
                 if (k > instrucoes.size() - 1) continue;
                 if (verificarHazardInstrucao(instrucoes[k], instrucoes[j], forwardingImplementado)) linhaValidaDepois = false;
             }
 
-            // Valida√ß√£o da linha ao sair de seu ponto de origem //
+            // ValidaÁ„o da linha ao sair de seu ponto de origem //
 
             bool linhaValidaAntes = true;
-            // Passa linha j se a linha j-1 n√£o tiver conflito com as proximas linhas caso a linha j seja removida
+            // Passa linha j se a linha j-1 n„o tiver conflito com as proximas linhas caso a linha j seja removida
             for (int k = j + 1; k <= j + (forwardingImplementado ? 1 : 2); k++) {
                 // Evita k de atravessar o tamanho maximo do vetor
                 if (k > instrucoes.size() - 1) continue;
@@ -279,7 +279,7 @@ vector<LinhaASM> aplicarReordenacao(vector<LinhaASM> instrucoes, vector<int> haz
             }
         }
 
-        // H√° uma instru√ß√£o que pode ser reordenada
+        // H· uma instruÁ„o que pode ser reordenada
         if (instrucaoEscolhidaDefinida) {
             instrucoes.insert(instrucoes.begin() + hazards[i] + 1, instrucaoEscolhida);
             instrucoes.erase(instrucoes.begin() + indiceInstrucaoEscolhida + 1);
@@ -289,28 +289,28 @@ vector<LinhaASM> aplicarReordenacao(vector<LinhaASM> instrucoes, vector<int> haz
 }
 
 
-// Verifica o vetor de instru√ß√µes assembly por
+// Verifica o vetor de instruÁıes assembly por
 // hazards de pipeline
-// regra base: rd atual n√£o pode ser utilizado
+// regra base: rd atual n„o pode ser utilizado
 // nos proximos 2 ciclos
-// exceto caso haja implementa√ß√£o de fowarding, que ai
-// √© apenas um ciclo
+// exceto caso haja implementaÁ„o de fowarding, que ai
+// È apenas um ciclo
 vector<int> verificarHazards(vector<LinhaASM> instrucoes, bool forwardingImplementado) {
     cout << "Executando verificacao de hazards" << endl;
     vector<int> falhas;
     for (int i = 0; i < instrucoes.size(); i++) {
-        // Ignora instru√ß√£o se o registrador de destino for zero, NOP
+        // Ignora instruÁ„o se o registrador de destino for zero, NOP
         if (instrucoes[i].tipoInstrucao != "S") {
             if (instrucoes[i].rd == "00000") continue;
         }
 
         // For loop 2 passos a frente de i
-        // verifica√ß√£o de dependencias
+        // verificaÁ„o de dependencias
         for (int j = i+1; j <= i+2; j++) {
-            // Ignora itera√ß√£o j caso passe da quantidade de instru√ß√µes
+            // Ignora iteraÁ„o j caso passe da quantidade de instruÁıes
             if (j >= instrucoes.size()) continue;
 
-            // Ignora segunda itera√ß√£o caso forwarding esteja implementado
+            // Ignora segunda iteraÁ„o caso forwarding esteja implementado
             if (j == i + 2 && forwardingImplementado) continue;
 
             if (verificarHazardInstrucao(instrucoes[i], instrucoes[j], forwardingImplementado)) {
@@ -326,7 +326,7 @@ vector<int> verificarHazards(vector<LinhaASM> instrucoes, bool forwardingImpleme
 }
 
 // Recebe um ifstream para ler e gera um vetor
-// cada indice do vetor representa uma instru√ß√£o de 32 bits
+// cada indice do vetor representa uma instruÁ„o de 32 bits
 vector<LinhaASM> lerArquivo(ifstream& arquivo) {
     vector<LinhaASM> instrucoes;
 
@@ -342,18 +342,18 @@ vector<LinhaASM> lerArquivo(ifstream& arquivo) {
 
         if (linhaAtual.instrucao.size() != 32) {
             if (arquivo.good()) {
-                // alguma linha n√£o est√° certa
+                // alguma linha n„o est· certa
                 throw std::runtime_error("Nao foi possivel ler a linha " + to_string(i) + ", verifique o arquivo.");
             }
             else {
-                // newline final, s√≥ ignorar
+                // newline final, sÛ ignorar
                 continue;
             }
         }
 
-        // obs: a ordem dos numeros s√£o o inverso do site
+        // obs: a ordem dos numeros s„o o inverso do site
         // https://jemu.oscc.cc/ADD
-        // (site vai da direita pra esquerda, aqui √© esq. pra dir.)
+        // (site vai da direita pra esquerda, aqui È esq. pra dir.)
         linhaAtual.opcode = linhaAtual.instrucao.substr(25, 7);
         linhaAtual.rd = linhaAtual.instrucao.substr(20, 5);
         linhaAtual.funct3 = linhaAtual.instrucao.substr(17, 3);
@@ -371,7 +371,7 @@ vector<LinhaASM> lerArquivo(ifstream& arquivo) {
 }
 
 // Retorna uma organizacao conforme
-// entrada do usu√°rio
+// entrada do usu·rio
 Organizacao criarOrganizacao(string nome) {
     cout << "----------------------\n ORGANIZACAO " << nome << endl;
     Organizacao resultado;
@@ -462,7 +462,7 @@ int main() {
     while (!finalizado) {
         system("cls");
 
-        // Cria as organiza√ß√µes se elas n√£o existem ou usuario quer refazer
+        // Cria as organizaÁıes se elas n„o existem ou usuario quer refazer
         if (semOrganizacao) {
             cout << "Criando organizacoes: " << endl;
             semOrganizacao = false;
@@ -503,11 +503,11 @@ int main() {
                 contarNOPs(instrucaoResolvida);
             }
         }
-        
+
 
 
         /*
-        * Debug das informa√ß√µes gerais
+        * Debug das informaÁıes gerais
         for (int i = 0; i < instrucoes.size(); i++) {
             cout << "INSTRUCAO " << i + 1 << " completa: " << instrucoes[i].instrucao << endl;
             cout << "TIPO DE INSTRUCAO: " << instrucoes[i].tipoInstrucao << endl;
@@ -531,7 +531,7 @@ int main() {
 
         cout << "----------------------" << endl;
         */
-        
+
 
         int escolha = 0;
         cout << endl << "Escolha uma opcao:" << endl;
