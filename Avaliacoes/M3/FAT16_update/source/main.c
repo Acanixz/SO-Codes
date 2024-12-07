@@ -22,20 +22,25 @@ void usage(char *executable)
 
 int main(int argc, char **argv)
 {
+	////////////////////////
+	/// Initialization ///
 
 	setlocale(LC_ALL, getenv("LANG"));
 
+	// Arg <= 1: Invalid argument
 	if (argc <= 1)
 		usage(argv[0]),
 		exit(EXIT_FAILURE);
 
+	// Arg == 2: Help argument
 	if (argc == 2 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0))
 		usage(argv[0]),
 		exit(EXIT_SUCCESS);
 
+	// Arg > 3: Operations
 	else if (argc >= 3 || argc >= 4)
 	{
-
+		// File opened in binary format for read/write (rb+)
 		FILE *fp = fopen(argv[argc - 1], "rb+");
 
 		if (!fp)
@@ -44,36 +49,45 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 
+		// Create and read BIOS parameter block
 		struct fat_bpb bpb;
 		rfat(fp, &bpb);
 		char *command = argv[1];
 
 //		verbose(&bpb);
 
+		////////////////////////
+		/// Commands ///
+
+		// List
 		if (strcmp(command, "ls") == 0)
 		{
 			struct fat_dir *dirs = ls(fp, &bpb);
 			show_files(dirs);
 		}
 
+		// Copy
 		if (strcmp(command, "cp") == 0)
 		{
 			cp(fp, argv[2], argv[3], &bpb);
 			fclose(fp);
 		}
 
-
+		// Move
 		if (strcmp(command, "mv") == 0)
 		{
 			mv(fp, argv[2], argv[3], &bpb);
 			fclose(fp);
 		}
+
+		// Remove
 		if (strcmp(command, "rm") == 0)
 		{
 			rm(fp, argv[2], &bpb);
 			fclose(fp);
 		}
 
+		// Cat (Concatenate)
 		if (strcmp(command, "cat") == 0)
 		{
 			cat(fp, argv[2], &bpb);
