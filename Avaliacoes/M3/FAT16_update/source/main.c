@@ -7,6 +7,9 @@
 #include "commands.h"
 #include "output.h"
 
+// Compilation command: gcc -I./include -o main ./source/*.c
+// Run on FAT16_update directory
+
 /* Show usage help */
 void usage(char *executable)
 {
