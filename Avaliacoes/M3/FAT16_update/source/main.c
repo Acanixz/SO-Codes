@@ -30,17 +30,17 @@ int main(int argc, char **argv)
 
 	setlocale(LC_ALL, getenv("LANG"));
 
-	// Arg <= 1: Invalid argument
+	// Args <= 1: Invalid argument count
 	if (argc <= 1)
 		usage(argv[0]),
 		exit(EXIT_FAILURE);
 
-	// Arg == 2: Help argument
+	// Args == 2: Help argument check
 	if (argc == 2 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0))
 		usage(argv[0]),
 		exit(EXIT_SUCCESS);
 
-	// Arg > 3: Operations
+	// Args > 3: Operations with FAT16 image
 	else if (argc >= 3 || argc >= 4)
 	{
 		// File opened in binary format for read/write (rb+)
